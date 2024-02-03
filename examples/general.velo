@@ -1,0 +1,3 @@
+x := input();
+print("You entered: ");
+print(x)
