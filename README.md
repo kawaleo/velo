@@ -1,4 +1,4 @@
-# Velo
+# velo 
 
 A programming language made in my spare time
 
