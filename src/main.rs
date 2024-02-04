@@ -10,6 +10,7 @@ use syntax::parse::Parser;
 mod error;
 mod runtime;
 mod syntax;
+mod utils;
 
 fn main() {
     let args: Vec<String> = env::args().collect();

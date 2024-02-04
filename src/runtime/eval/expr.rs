@@ -1,5 +1,6 @@
 use super::super::environment::Environment;
 use crate::syntax::ast::{Expression, Statement};
+use crate::utils::interpolate_string;
 
 use std::io;
 
@@ -39,9 +40,11 @@ pub fn eval_call_expr(call_expr: &Expression, env: &mut Environment, var: Option
                             match expr {
                                 Expression::StringLiteral(str) => {
                                     if line {
-                                        println!("{}", str)
+                                        let interpolated = interpolate_string(str, env);
+                                        println!("{}", interpolated)
                                     } else {
-                                        print!("{}", str)
+                                        let interpolated = interpolate_string(str, env);
+                                        print!("{}", interpolated)
                                     }
                                 }
                                 _ => {
@@ -55,9 +58,11 @@ pub fn eval_call_expr(call_expr: &Expression, env: &mut Environment, var: Option
                     }
                     Expression::StringLiteral(ident) => {
                         if line {
-                            println!("{}", ident)
+                            let interpolated = interpolate_string(ident, env);
+                            println!("{}", interpolated)
                         } else {
-                            print!("{}", ident)
+                            let interpolated = interpolate_string(ident, env);
+                            print!("{}", interpolated)
                         }
                     }
                     _ => todo!(),

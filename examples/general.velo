@@ -1,3 +1,3 @@
-x := input();
-print("You entered: ");
-print(x)
+name := input();
+x := "Hello, ${name}";
+print(x);
