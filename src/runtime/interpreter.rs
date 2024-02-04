@@ -7,7 +7,7 @@ use crate::{
 
 // TODO: Create a separate call expr function that just returns an expression
 // I'll use it when parsing variables probably
-pub fn evaluate(nodes: Vec<Ast>) {
+pub fn evaluate(nodes: Vec<Ast>, debug: bool) {
     let mut env = Environment::init();
     for node in nodes {
         match node {
@@ -43,5 +43,9 @@ pub fn evaluate(nodes: Vec<Ast>) {
             },
         }
     }
-    println!("\n{:#?}", env)
+    if debug {
+        println!("\n{:#?}", env);
+    } else {
+        println!("\0");
+    }
 }
