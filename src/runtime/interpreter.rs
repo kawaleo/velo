@@ -32,6 +32,9 @@ pub fn evaluate(nodes: Vec<Ast>, debug: bool) {
                     Expression::CallExpr { name: _, params: _ } => {
                         eval_call_expr(&value, &mut env, Some(&stmt))
                     }
+                    Expression::BinaryOp { lhs, op, rhs } => {
+                        env.declare_variable(name.to_string(), value.clone(), constant);
+                    }
                     _ => {
                         let v = match value {
                             Expression::StringLiteral(str) => {
