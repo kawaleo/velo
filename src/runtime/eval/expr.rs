@@ -4,9 +4,11 @@ use crate::utils::interpolate_string;
 
 use std::io;
 
+#[allow(unused)]
 pub fn eval_call_expr(call_expr: &Expression, env: &mut Environment, var: Option<&Statement>) {
     let mut nm = String::new();
     let mut pm: Vec<Expression> = Vec::new();
+
     match call_expr {
         Expression::CallExpr { name, params } => {
             nm = name.to_string();

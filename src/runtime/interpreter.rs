@@ -13,8 +13,12 @@ pub fn evaluate(nodes: Vec<Ast>, debug: bool) {
         match node {
             Ast::Expression(expr) => match expr {
                 Expression::CallExpr {
+                    name: _,
+                    params: _,
+                    /*
                     ref name,
                     ref params,
+                    */
                 } => eval_call_expr(&expr, &mut env, None),
                 Expression::Null => {}
                 _ => unimplemented!(), // sticking out your gyat

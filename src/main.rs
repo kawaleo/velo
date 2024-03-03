@@ -72,7 +72,7 @@ fn repl(options: RuntimeOptions) {
         let tokens = tokens.tokens;
 
         let mut parser = Parser::new(tokens);
-        parser.parse();
+        let _ = parser.parse();
 
         evaluate(parser.nodes, options.debug_mode);
     }
@@ -84,7 +84,7 @@ fn parse_file(contents: String, options: RuntimeOptions) {
     let tokens = tokens.tokens;
 
     let mut parser = Parser::new(tokens);
-    parser.parse();
+    let _ = parser.parse();
     println!("{:#?}", options);
 
     evaluate(parser.nodes, options.debug_mode);
