@@ -15,6 +15,10 @@ pub enum Statement {
         name: String,
         value: Expression,
     },
+    IfStatement {
+        expr: Expression,
+        body: Vec<Ast>,
+    },
     Function {
         name: String,
         params: Vec<(String, Type)>,
@@ -66,8 +70,8 @@ pub enum Expression {
     },
 
     BinaryOp {
-        lhs: Box<Ast>,
+        lhs: Box<Expression>,
         op: TokenType,
-        rhs: Box<Ast>,
+        rhs: Box<Expression>,
     },
 }

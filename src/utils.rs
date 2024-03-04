@@ -20,9 +20,13 @@ pub fn interpolate_string(input: &str, env: &Environment) -> String {
                     if let Some(var) = env.variables.get(&var_name) {
                         match var {
                             Expression::StringLiteral(str) => result.push_str(str),
-                            Expression::BinaryOp { lhs, op, rhs } => {
-                                result.push_str(&format!("{:#?}", var))
-                            }
+                            //TODO: Actually evaluate the expression
+                            Expression::BinaryOp {
+                                lhs: _,
+                                op: _,
+                                rhs: _,
+                            } => result.push_str(&format!("{:#?}", var)),
+                            Expression::Float(val) => result.push_str(&format!("{:#?}", val)),
                             _ => todo!(),
                         }
                     } else {
