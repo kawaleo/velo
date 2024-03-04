@@ -2,13 +2,11 @@ use super::environment::Environment;
 use super::eval::expr::*;
 use crate::{
     syntax::ast::{Ast, Expression, Statement},
-    utils::interpolate_string,
+    syntax::{lexer::Lexer, parse::Parser},
+    utils::{expand_tilde, interpolate_string},
 };
 
-// TODO: Create a separate call expr function that just returns an expression
-// I'll use it when parsing variables probably
-pub fn evaluate(nodes: Vec<Ast>, debug: bool) {
-    let mut env = Environment::init();
+pub fn evaluate(nodes: Vec<Ast>, debug: bool, env: &mut Environment) {
     for node in nodes {
         match node {
             Ast::Expression(expr) => match expr {
@@ -19,7 +17,7 @@ pub fn evaluate(nodes: Vec<Ast>, debug: bool) {
                     ref name,
                     ref params,
                     */
-                } => eval_call_expr(&expr, &mut env, None),
+                } => eval_call_expr(&expr, env, None),
                 Expression::Null => {}
                 _ => unimplemented!(), // sticking out your gyat
             },
@@ -30,8 +28,9 @@ pub fn evaluate(nodes: Vec<Ast>, debug: bool) {
                     ref value,
                 } => match value {
                     Expression::CallExpr { name: _, params: _ } => {
-                        eval_call_expr(&value, &mut env, Some(&stmt))
+                        eval_call_expr(&value, env, Some(&stmt))
                     }
+                    #[allow(unused)]
                     Expression::BinaryOp { lhs, op, rhs } => {
                         env.declare_variable(name.to_string(), value.clone(), constant);
                     }
@@ -46,6 +45,20 @@ pub fn evaluate(nodes: Vec<Ast>, debug: bool) {
                         env.declare_variable(name.to_string(), v.clone(), constant);
                     }
                 },
+                Statement::Import(path) => {
+                    println!("Importing file: {}", path);
+                    let full_path = expand_tilde(&path);
+
+                    let contents = std::fs::read_to_string(&full_path).unwrap();
+                    let mut lexer = Lexer::new(&contents);
+                    let tokens = lexer.tokenize().tokens;
+
+                    let mut parser = Parser::new(tokens);
+                    let _ = parser.parse();
+
+                    evaluate(parser.nodes, debug, env);
+                    continue;
+                }
                 _ => todo!(),
             },
         }

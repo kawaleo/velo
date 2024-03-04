@@ -7,6 +7,8 @@ use runtime::interpreter::evaluate;
 use syntax::lexer::Lexer;
 use syntax::parse::Parser;
 
+use crate::runtime::environment::Environment;
+
 mod cli;
 mod error;
 mod runtime;
@@ -68,13 +70,13 @@ fn repl(options: RuntimeOptions) {
         }
 
         let mut lexer = Lexer::new(&input);
-        let tokens = lexer.tokenize();
-        let tokens = tokens.tokens;
+        let tokens = lexer.tokenize().tokens;
 
         let mut parser = Parser::new(tokens);
         let _ = parser.parse();
+        let mut env = Environment::init();
 
-        evaluate(parser.nodes, options.debug_mode);
+        evaluate(parser.nodes, options.debug_mode, &mut env);
     }
 }
 
@@ -85,7 +87,7 @@ fn parse_file(contents: String, options: RuntimeOptions) {
 
     let mut parser = Parser::new(tokens);
     let _ = parser.parse();
-    println!("{:#?}", options);
+    let mut env = Environment::init();
 
-    evaluate(parser.nodes, options.debug_mode);
+    evaluate(parser.nodes, options.debug_mode, &mut env);
 }

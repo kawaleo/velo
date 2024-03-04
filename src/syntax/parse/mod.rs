@@ -45,6 +45,9 @@ impl Parser {
                         _ => unimplemented!(),
                     }
                 }
+                TokenType::Import => {
+                    self.import_path();
+                }
                 TokenType::Semicolon => {
                     self.tokens.remove(0);
                 }
@@ -201,6 +204,20 @@ impl Parser {
                 return Expression::Float(0.0);
             }
         }
+    }
+
+    fn import_path(&mut self) {
+        let mut path = String::new();
+        self.cursor += 1;
+        if let Some(token) = self.tokens.get(self.cursor) {
+            if token.token_type == TokenType::String {
+                self.cursor += 1;
+                path = token.lexeme.clone();
+            }
+        }
+        self.tokens.drain(0..self.cursor);
+        self.cursor = 0;
+        self.nodes.push(Ast::Statement(Statement::Import(path)));
     }
 
     pub fn throw_error(&mut self, line: usize, message: String) {

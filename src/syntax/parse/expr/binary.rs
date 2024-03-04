@@ -1,4 +1,4 @@
-use crate::syntax::ast::{Ast, Expression};
+use crate::syntax::ast::Expression;
 use crate::syntax::lexer::{Token, TokenType};
 use crate::syntax::parse::Parser;
 
@@ -74,15 +74,15 @@ impl Parser {
 
     fn evaluate_binary(expr: &Expression) -> f32 {
         match expr {
-            Expression::Float(val) => (*val),
+            Expression::Float(val) => *val,
             Expression::BinaryOp { lhs, op, rhs } => {
                 let lhs = Self::evaluate_binary(lhs);
                 let rhs = Self::evaluate_binary(rhs);
                 match op {
-                    TokenType::Add => (lhs + rhs),
-                    TokenType::Sub => (lhs - rhs),
-                    TokenType::Mul => (lhs * rhs),
-                    TokenType::Div => (lhs / rhs),
+                    TokenType::Add => lhs + rhs,
+                    TokenType::Sub => lhs - rhs,
+                    TokenType::Mul => lhs * rhs,
+                    TokenType::Div => lhs / rhs,
                     _ => unreachable!(),
                 }
             }

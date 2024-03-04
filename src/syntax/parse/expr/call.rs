@@ -45,6 +45,7 @@ impl Parser {
                     }
                 }
                 TokenType::RParen => break,
+                TokenType::EOF => break,
 
                 _ => {
                     println!("`{}` is unimplemented!", param_token.lexeme.clone());

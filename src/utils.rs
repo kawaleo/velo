@@ -1,5 +1,16 @@
 use crate::runtime::environment::Environment;
 use crate::syntax::ast::Expression;
+use std::path::PathBuf;
+
+#[allow(deprecated)]
+pub fn expand_tilde(path: &str) -> PathBuf {
+    if path.starts_with('~') {
+        if let Some((home, rest)) = std::env::home_dir().and_then(|h| Some((h, &path[1..]))) {
+            return [home.to_str().unwrap(), rest].iter().collect();
+        }
+    }
+    path.into()
+}
 
 pub fn interpolate_string(input: &str, env: &Environment) -> String {
     let mut result = String::new();

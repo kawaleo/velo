@@ -1,3 +1,4 @@
+#![allow(unused)]
 use super::super::Parser;
 use crate::error::ERROR_INDICATOR;
 use crate::syntax::ast::{Ast, Expression, Statement};

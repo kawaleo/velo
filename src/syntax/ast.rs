@@ -25,10 +25,7 @@ pub enum Statement {
         body: FunctionBody,
         ret_type: Type,
     },
-    ImportPath {
-        path: String,
-        is_library: bool,
-    },
+    Import(String),
     ExprStmt(Expression),
 }
 
