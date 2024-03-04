@@ -32,6 +32,7 @@ impl Parser {
                     ops_stack.push(tokens[i].token_type.clone());
                 }
                 TokenType::Identifier => {
+                    // We are adding a variable
                     let num = tokens[i].lexeme.clone();
                     expr_stack.push(Expression::Identifier(num));
                 }
@@ -58,9 +59,7 @@ impl Parser {
         }
 
         // The result should be the last expression left on the stack
-        let equation = expr_stack.pop().unwrap();
-        let evaluated = Self::evaluate_binary(&equation);
-        Expression::Float(evaluated)
+        expr_stack.pop().unwrap()
     }
 
     // Function to determine precedence of operators
@@ -69,24 +68,6 @@ impl Parser {
             TokenType::Add | TokenType::Sub => 1,
             TokenType::Mul | TokenType::Div => 2,
             _ => 0, // Parentheses don't have precedence in this implementation
-        }
-    }
-
-    fn evaluate_binary(expr: &Expression) -> f32 {
-        match expr {
-            Expression::Float(val) => *val,
-            Expression::BinaryOp { lhs, op, rhs } => {
-                let lhs = Self::evaluate_binary(lhs);
-                let rhs = Self::evaluate_binary(rhs);
-                match op {
-                    TokenType::Add => lhs + rhs,
-                    TokenType::Sub => lhs - rhs,
-                    TokenType::Mul => lhs * rhs,
-                    TokenType::Div => lhs / rhs,
-                    _ => unreachable!(),
-                }
-            }
-            _ => unreachable!(),
         }
     }
 }

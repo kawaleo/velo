@@ -32,7 +32,12 @@ pub fn evaluate(nodes: Vec<Ast>, debug: bool, env: &mut Environment) {
                     }
                     #[allow(unused)]
                     Expression::BinaryOp { lhs, op, rhs } => {
-                        env.declare_variable(name.to_string(), value.clone(), constant);
+                        let eval = evaluate_binary(&value, env);
+                        env.declare_variable(
+                            name.to_string(),
+                            Expression::Float(eval.clone()),
+                            constant,
+                        );
                     }
                     _ => {
                         let v = match value {

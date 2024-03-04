@@ -1,5 +1,6 @@
 use super::super::environment::Environment;
 use crate::syntax::ast::{Expression, Statement};
+use crate::syntax::lexer::{Token, TokenType, Type};
 use crate::utils::interpolate_string;
 
 use std::io;
@@ -99,5 +100,27 @@ pub fn eval_call_expr(call_expr: &Expression, env: &mut Environment, var: Option
             }
             _ => unimplemented!(),
         }
+    }
+}
+
+pub fn evaluate_binary(expr: &Expression, env: &Environment) -> f32 {
+    match expr {
+        Expression::Float(val) => *val,
+        Expression::Identifier(val) => match env.variables.get(val) {
+            Some(Expression::Float(val)) => *val,
+            _ => todo!(),
+        },
+        Expression::BinaryOp { lhs, op, rhs } => {
+            let lhs = evaluate_binary(lhs, env);
+            let rhs = evaluate_binary(rhs, env);
+            match op {
+                TokenType::Add => lhs + rhs,
+                TokenType::Sub => lhs - rhs,
+                TokenType::Mul => lhs * rhs,
+                TokenType::Div => lhs / rhs,
+                _ => unreachable!(),
+            }
+        }
+        _ => unreachable!(),
     }
 }
