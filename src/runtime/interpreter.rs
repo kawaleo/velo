@@ -1,5 +1,5 @@
-use super::environment::Environment;
 use super::eval::expr::*;
+use super::{environment::Environment, eval};
 use crate::{
     syntax::ast::{Ast, Expression, Statement},
     syntax::{lexer::Lexer, parse::Parser},
@@ -55,6 +55,18 @@ pub fn evaluate(nodes: Vec<Ast>, debug: bool, env: &mut Environment) {
                         env.declare_variable(name.to_string(), v.clone(), constant);
                     }
                 },
+                Statement::IfStatement { condition, body } => {
+                    let eval = evaluate_conditional(&condition, env);
+                    println!("{:#?}\n{:#?}", eval, body);
+                    match eval {
+                        Expression::Bool(val) => {
+                            if val {
+                                evaluate(body, debug, env);
+                            }
+                        }
+                        _ => {}
+                    }
+                }
                 Statement::Import(path) => {
                     println!("Importing file: {}", path);
                     let full_path = expand_tilde(&path);

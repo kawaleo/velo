@@ -32,6 +32,7 @@ impl Parser {
                 TokenType::Immut => {
                     self.variable_assignment(false, None, true, false);
                 }
+                TokenType::If => self.if_statement(),
                 TokenType::Function => self.function_declaration(),
                 TokenType::Identifier => {
                     match self.tokens[1].token_type {
@@ -121,6 +122,37 @@ impl Parser {
                 Expression::Null
             }
         }
+    }
+
+    fn if_statement(&mut self) {
+        self.cursor += 1;
+        let mut to_eval = Vec::new();
+        #[allow(unused, unused_mut)]
+        let mut body_tokens = Vec::new();
+
+        while self.tokens[self.cursor].token_type != TokenType::LBrace {
+            to_eval.push(self.tokens[self.cursor].clone());
+            self.cursor += 1;
+        }
+
+        // {
+        self.cursor += 1;
+        while self.tokens[self.cursor].token_type != TokenType::RBrace {
+            body_tokens.push(self.tokens[self.cursor].clone());
+            self.cursor += 1;
+        }
+
+        self.cursor += 1;
+        let body = Parser::new(body_tokens)
+            .parse()
+            .expect("Error parsing if statement");
+
+        let condition = Self::parse_expression(to_eval);
+        let statement = Statement::IfStatement { condition, body };
+
+        self.nodes.push(Ast::Statement(statement));
+        self.tokens.drain(0..=self.cursor);
+        self.cursor = 0;
     }
 
     fn import_path(&mut self) {

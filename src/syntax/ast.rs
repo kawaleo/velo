@@ -17,7 +17,6 @@ pub enum Statement {
     },
     IfStatement {
         condition: Expression,
-        condition_type: ConditionType,
         body: Vec<Ast>,
     },
     Function {
