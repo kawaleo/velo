@@ -71,6 +71,6 @@ pub fn evaluate(nodes: Vec<Ast>, debug: bool, env: &mut Environment) {
     if debug {
         println!("\n{:#?}", env);
     } else {
-        println!("\0");
+        println!("\0")
     }
 }

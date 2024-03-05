@@ -85,9 +85,9 @@ fn parse_file(contents: String, options: RuntimeOptions) {
     let tokens = lexer.tokenize();
     let tokens = tokens.tokens;
 
+    let mut env = Environment::init();
     let mut parser = Parser::new(tokens);
     let _ = parser.parse();
-    let mut env = Environment::init();
 
     evaluate(parser.nodes, options.debug_mode, &mut env);
 }

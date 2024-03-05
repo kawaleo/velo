@@ -16,7 +16,8 @@ pub enum Statement {
         value: Expression,
     },
     IfStatement {
-        expr: Expression,
+        condition: Expression,
+        condition_type: ConditionType,
         body: Vec<Ast>,
     },
     Function {
@@ -71,4 +72,17 @@ pub enum Expression {
         op: TokenType,
         rhs: Box<Expression>,
     },
+
+    Conditional {
+        lhs: Box<Expression>,
+        op: ConditionType,
+        rhs: Box<Expression>,
+    },
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum ConditionType {
+    Equal,
+    NotEqual,
+    Unary,
 }

@@ -37,6 +37,9 @@ pub fn interpolate_string(input: &str, env: &Environment) -> String {
                                 op: _,
                                 rhs: _,
                             } => result.push_str(&format!("{:#?}", var)),
+                            Expression::Conditional { lhs, op, rhs } => {
+                                result.push_str(&format!("{:#?}", var))
+                            }
                             Expression::Float(val) => result.push_str(&format!("{:#?}", val)),
                             _ => todo!(),
                         }

@@ -1,8 +1,68 @@
-use crate::syntax::ast::Expression;
-use crate::syntax::lexer::{Token, TokenType};
+use crate::error::ERROR_INDICATOR;
+use crate::syntax::ast::{ConditionType, Expression};
+use crate::syntax::lexer::{KeywordMap, Token, TokenType, KEYWORDS};
 use crate::syntax::parse::Parser;
 
 impl Parser {
+    pub fn parse_binary(&mut self) -> Expression {
+        let mut to_eval: Vec<Token> = Vec::new();
+
+        let mut keyword_error = false;
+        let mut keyword_fault = TokenType::Null;
+        let mut current_index = self.cursor + 1;
+
+        to_eval.push(self.tokens[current_index - 1].clone());
+
+        while let Some(next_token) = self.tokens.get(current_index) {
+            if [
+                TokenType::NumericLiteral,
+                TokenType::Identifier,
+                TokenType::Add,
+                TokenType::Sub,
+                TokenType::Mul,
+                TokenType::Div,
+                TokenType::EqEq, // Include DoubleEqual for truthy evaluation
+            ]
+            .contains(&next_token.token_type)
+                || KeywordMap::get(&KEYWORDS, &next_token.lexeme).is_some()
+            {
+                if KEYWORDS.get(&next_token.lexeme).is_some() {
+                    keyword_error = true;
+                    keyword_fault = next_token.token_type;
+                    println!("keyword: {:#?}", KEYWORDS.get(&next_token.lexeme))
+                }
+                if next_token.token_type == TokenType::Identifier {
+                    to_eval.push(next_token.clone());
+                    current_index += 1;
+                } else {
+                    to_eval.push(next_token.clone());
+                    current_index += 1;
+                }
+            } else {
+                break;
+            }
+        }
+
+        let keyword_error_msg = format!(
+            "{} \x1b[1mExpected ';' after expression, found keyword '{}'\x1b[0m",
+            ERROR_INDICATOR,
+            TokenType::to_string(keyword_fault),
+        );
+
+        self.cursor = current_index - 1;
+
+        match keyword_error {
+            false => {
+                let res = Self::parse_expression(to_eval); // Modified to capture truthy result
+                res
+            }
+            _ => {
+                self.throw_error(self.tokens[1].line_num, keyword_error_msg);
+                Expression::Float(0.0)
+            }
+        }
+    }
+
     pub fn parse_expression(tokens: Vec<Token>) -> Expression {
         let mut ops_stack: Vec<TokenType> = Vec::new();
         let mut expr_stack: Vec<Expression> = Vec::new();
@@ -68,6 +128,14 @@ impl Parser {
             TokenType::Add | TokenType::Sub => 1,
             TokenType::Mul | TokenType::Div => 2,
             _ => 0, // Parentheses don't have precedence in this implementation
+        }
+    }
+
+    // Function to evaluate equality
+    pub fn evaluate_equality(lhs: Expression, rhs: Expression) -> bool {
+        match (lhs, rhs) {
+            (Expression::Float(lhs_val), Expression::Float(rhs_val)) => lhs_val == rhs_val,
+            _ => false, // If either side is not a float, consider them not equal
         }
     }
 }
