@@ -39,6 +39,11 @@ pub fn evaluate(nodes: Vec<Ast>, debug: bool, env: &mut Environment) {
                             constant,
                         );
                     }
+                    #[allow(unused)]
+                    Expression::Conditional { lhs, op, rhs } => {
+                        let eval = evaluate_conditional(&value, env);
+                        env.declare_variable(name.to_string(), eval.clone(), constant);
+                    }
                     _ => {
                         let v = match value {
                             Expression::StringLiteral(str) => {

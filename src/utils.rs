@@ -31,7 +31,7 @@ pub fn interpolate_string(input: &str, env: &Environment) -> String {
                     if let Some(var) = env.variables.get(&var_name) {
                         match var {
                             Expression::StringLiteral(str) => result.push_str(str),
-                            //TODO: Actually evaluate the expression
+                            Expression::Bool(val) => result.push_str(&format!("{}", val)),
                             Expression::BinaryOp {
                                 lhs: _,
                                 op: _,

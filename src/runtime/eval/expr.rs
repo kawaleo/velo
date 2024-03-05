@@ -1,7 +1,6 @@
 use super::super::environment::Environment;
 use crate::syntax::ast::{ConditionType, Expression, Statement};
-use crate::syntax::lexer::{Token, TokenType, Type};
-use crate::syntax::parse::Parser;
+use crate::syntax::lexer::TokenType;
 use crate::utils::interpolate_string;
 
 use std::io;
@@ -119,15 +118,22 @@ pub fn evaluate_binary(expr: &Expression, env: &Environment) -> f32 {
                 TokenType::Sub => lhs - rhs,
                 TokenType::Mul => lhs * rhs,
                 TokenType::Div => lhs / rhs,
-                TokenType::EqEq => {
-                    println!("LHS: {:#?}\n RHS: {:#?}", &lhs, &rhs);
-                    if (lhs - rhs).abs() < std::f32::EPSILON {
-                        1.0 // Return 1.0 if the values are approximately equal
-                    } else {
-                        0.0 // Otherwise return 0.0
-                    }
-                }
                 _ => unreachable!(),
+            }
+        }
+        _ => unreachable!(),
+    }
+}
+
+pub fn evaluate_conditional(expr: &Expression, env: &Environment) -> Expression {
+    match expr {
+        Expression::Conditional { lhs, op, rhs } => {
+            let lhs = evaluate_binary(lhs, env);
+            let rhs = evaluate_binary(rhs, env);
+            match op {
+                ConditionType::Equal => Expression::Bool(lhs == rhs),
+                ConditionType::NotEqual => Expression::Bool(lhs != rhs),
+                ConditionType::Unary => todo!(),
             }
         }
         _ => unreachable!(),
