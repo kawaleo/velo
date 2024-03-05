@@ -1,5 +1,5 @@
 use crate::error::ERROR_INDICATOR;
-use crate::syntax::ast::{ConditionType, Expression};
+use crate::syntax::ast::Expression;
 use crate::syntax::lexer::{KeywordMap, Token, TokenType, KEYWORDS};
 use crate::syntax::parse::Parser;
 
@@ -62,7 +62,6 @@ impl Parser {
             }
         }
     }
-
     pub fn parse_expression(tokens: Vec<Token>) -> Expression {
         let mut ops_stack: Vec<TokenType> = Vec::new();
         let mut expr_stack: Vec<Expression> = Vec::new();
@@ -128,14 +127,6 @@ impl Parser {
             TokenType::Add | TokenType::Sub => 1,
             TokenType::Mul | TokenType::Div => 2,
             _ => 0, // Parentheses don't have precedence in this implementation
-        }
-    }
-
-    // Function to evaluate equality
-    pub fn evaluate_equality(lhs: Expression, rhs: Expression) -> bool {
-        match (lhs, rhs) {
-            (Expression::Float(lhs_val), Expression::Float(rhs_val)) => lhs_val == rhs_val,
-            _ => false, // If either side is not a float, consider them not equal
         }
     }
 }

@@ -130,22 +130,6 @@ pub fn evaluate_binary(expr: &Expression, env: &Environment) -> f32 {
                 _ => unreachable!(),
             }
         }
-        Expression::Conditional { lhs, op, rhs } => {
-            println!("Entering conditional");
-            let lhs = evaluate_binary(lhs, env);
-            let rhs = evaluate_binary(rhs, env);
-            println!("LHS: {:#?}\n RHS: {:#?}", &lhs, &rhs);
-            match op {
-                ConditionType::Equal => {
-                    if Parser::evaluate_equality(Expression::Float(lhs), Expression::Float(rhs)) {
-                        1.0
-                    } else {
-                        0.0
-                    }
-                }
-                _ => unreachable!(),
-            }
-        }
         _ => unreachable!(),
     }
 }
