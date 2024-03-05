@@ -1,7 +1,7 @@
 use crate::error::ERROR_INDICATOR;
 use crate::syntax::ast::Expression;
 use crate::syntax::lexer::{KeywordMap, Token, TokenType, KEYWORDS};
-use crate::syntax::parse::Parser;
+use crate::syntax::parse::{ConditionType, Parser};
 
 impl Parser {
     pub fn parse_binary(&mut self) -> Expression {
@@ -62,10 +62,29 @@ impl Parser {
             }
         }
     }
+
     pub fn parse_expression(tokens: Vec<Token>) -> Expression {
         let mut ops_stack: Vec<TokenType> = Vec::new();
         let mut expr_stack: Vec<Expression> = Vec::new();
         let mut i = 0;
+
+        let mut index = 0;
+        while index < tokens.len() {
+            if tokens[index].token_type == TokenType::EqEq {
+                let lhs_tokens = tokens[..index].to_vec();
+                let rhs_tokens = tokens[(index + 1)..].to_vec();
+
+                let lhs_expr = Self::parse_expression(lhs_tokens);
+                let rhs_expr = Self::parse_expression(rhs_tokens);
+
+                return Expression::Conditional {
+                    lhs: Box::new(lhs_expr),
+                    op: ConditionType::Equal,
+                    rhs: Box::new(rhs_expr),
+                };
+            }
+            index += 1;
+        }
 
         while i < tokens.len() {
             match tokens[i].token_type {
