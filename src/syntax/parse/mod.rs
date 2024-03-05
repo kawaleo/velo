@@ -98,7 +98,7 @@ impl Parser {
             TokenType::True => Expression::Bool(true),
             TokenType::False => Expression::Bool(false),
             TokenType::String => Expression::StringLiteral(token.lexeme.clone()),
-            TokenType::NumericLiteral | TokenType::Identifier => {
+            TokenType::NumericLiteral | TokenType::Identifier | TokenType::LParen => {
                 if self.tokens.get(self.cursor + 1).is_some() {
                     self.parse_binary()
                 } else {
@@ -124,37 +124,6 @@ impl Parser {
         }
     }
 
-    fn if_statement(&mut self) {
-        self.cursor += 1;
-        let mut to_eval = Vec::new();
-        #[allow(unused, unused_mut)]
-        let mut body_tokens = Vec::new();
-
-        while self.tokens[self.cursor].token_type != TokenType::LBrace {
-            to_eval.push(self.tokens[self.cursor].clone());
-            self.cursor += 1;
-        }
-
-        // {
-        self.cursor += 1;
-        while self.tokens[self.cursor].token_type != TokenType::RBrace {
-            body_tokens.push(self.tokens[self.cursor].clone());
-            self.cursor += 1;
-        }
-
-        self.cursor += 1;
-        let body = Parser::new(body_tokens)
-            .parse()
-            .expect("Error parsing if statement");
-
-        let condition = Self::parse_expression(to_eval);
-        let statement = Statement::IfStatement { condition, body };
-
-        self.nodes.push(Ast::Statement(statement));
-        self.tokens.drain(0..=self.cursor);
-        self.cursor = 0;
-    }
-
     fn import_path(&mut self) {
         let mut path = String::new();
         self.cursor += 1;
@@ -167,6 +136,11 @@ impl Parser {
         self.tokens.drain(0..self.cursor);
         self.cursor = 0;
         self.nodes.push(Ast::Statement(Statement::Import(path)));
+    }
+
+    fn reset_cursor(&mut self) {
+        self.tokens.drain(0..=self.cursor);
+        self.cursor = 0;
     }
 
     pub fn throw_error(&mut self, line: usize, message: String) {

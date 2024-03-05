@@ -121,7 +121,10 @@ pub fn evaluate_binary(expr: &Expression, env: &Environment) -> f32 {
                 _ => unreachable!(),
             }
         }
-        _ => unreachable!(),
+        _ => {
+            println!("{:#?}", expr);
+            unreachable!()
+        }
     }
 }
 

@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 pub const ERROR_INDICATOR: &str = "\x1b[1m[\x1b[0m\x1b[1;31merror\x1b[0m\x1b[1m]:\x1b[0m";
 
 #[derive(Debug, Clone, PartialEq, Eq)]

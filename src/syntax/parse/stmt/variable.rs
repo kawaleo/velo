@@ -72,8 +72,7 @@ impl Parser {
             true => res = Some(variable),
         }
         if !in_fn {
-            self.tokens.drain(0..=self.cursor); // Adjusted token removal range
-            self.cursor = 0;
+            self.reset_cursor()
         }
 
         res

@@ -57,13 +57,7 @@ impl Parser {
         let nm = format!("{}", &name);
         let call_expr = Expression::CallExpr { name, params };
 
-        self.tokens.drain(0..self.cursor); // so uhh... forgot to add this line...
-                                           // took 2 hours to figure out why it wasnt working
-                                           // having fun :)
-
-        self.cursor = 0; // once again, forgot to add this line
-                         // took me around 30 minutes before i walked away
-                         // literally figured out the error while rock climbing... lol
+        self.reset_cursor();
         self.nodes.push(Ast::Expression(call_expr));
         Expression::CallExpr {
             name: nm,
