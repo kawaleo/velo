@@ -22,6 +22,7 @@ impl Parser {
                 TokenType::Mul,
                 TokenType::Div,
                 TokenType::EqEq, // Include DoubleEqual for truthy evaluation
+                TokenType::LParen,
             ]
             .contains(&next_token.token_type)
                 || KeywordMap::get(&KEYWORDS, &next_token.lexeme).is_some()
@@ -88,10 +89,16 @@ impl Parser {
 
         while i < tokens.len() {
             match tokens[i].token_type {
-                TokenType::Add | TokenType::Sub | TokenType::Mul | TokenType::Div => {
+                TokenType::LParen => {
+                    ops_stack.push(TokenType::LParen);
+                    expr_stack.push(Expression::Null);
+                }
+                TokenType::RParen => {
                     while let Some(&top_op) = ops_stack.last() {
-                        if Self::precedence(&top_op) >= Self::precedence(&tokens[i].token_type) {
-                            // Pop the top operator from the stack and apply it to the operands
+                        if top_op == TokenType::LParen {
+                            ops_stack.pop().unwrap();
+                            break;
+                        } else {
                             let rhs_expr = expr_stack.pop().unwrap();
                             let lhs_expr = expr_stack.pop().unwrap();
                             let op = ops_stack.pop().unwrap();
@@ -100,17 +107,31 @@ impl Parser {
                                 op,
                                 rhs: Box::new(rhs_expr),
                             };
-                            // Push the result back to the expression stack
+                            expr_stack.push(new_expr);
+                        }
+                    }
+                }
+                TokenType::Add | TokenType::Sub | TokenType::Mul | TokenType::Div => {
+                    while let Some(&top_op) = ops_stack.last() {
+                        if Self::precedence(&top_op) >= Self::precedence(&tokens[i].token_type)
+                            && top_op != TokenType::LParen
+                        {
+                            let rhs_expr = expr_stack.pop().unwrap();
+                            let lhs_expr = expr_stack.pop().unwrap();
+                            let op = ops_stack.pop().unwrap();
+                            let new_expr = Expression::BinaryOp {
+                                lhs: Box::new(lhs_expr),
+                                op,
+                                rhs: Box::new(rhs_expr),
+                            };
                             expr_stack.push(new_expr);
                         } else {
                             break;
                         }
                     }
-                    // Push the current operator to the stack
                     ops_stack.push(tokens[i].token_type.clone());
                 }
                 TokenType::Identifier => {
-                    // We are adding a variable
                     let num = tokens[i].lexeme.clone();
                     expr_stack.push(Expression::Identifier(num));
                 }
@@ -124,10 +145,10 @@ impl Parser {
             i += 1;
         }
 
-        // Pop any remaining operators from the stack and apply them
-        while let Some(op) = ops_stack.pop() {
+        while !ops_stack.is_empty() {
             let rhs_expr = expr_stack.pop().unwrap();
             let lhs_expr = expr_stack.pop().unwrap();
+            let op = ops_stack.pop().unwrap();
             let new_expr = Expression::BinaryOp {
                 lhs: Box::new(lhs_expr),
                 op,
@@ -136,16 +157,15 @@ impl Parser {
             expr_stack.push(new_expr);
         }
 
-        // The result should be the last expression left on the stack
         expr_stack.pop().unwrap()
     }
 
-    // Function to determine precedence of operators
     fn precedence(op: &TokenType) -> i32 {
         match op {
             TokenType::Add | TokenType::Sub => 1,
             TokenType::Mul | TokenType::Div => 2,
-            _ => 0, // Parentheses don't have precedence in this implementation
+            TokenType::LParen => 3,
+            _ => 0,
         }
     }
 }
